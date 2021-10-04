@@ -1,0 +1,108 @@
+﻿@model SimpleSEOAnalyser.Models.SimpleModel
+@{
+	ViewBag.Title = "Simple SEO Analyser";
+}
+<div class="jumbotron">
+	<h2>Try me!</h2>
+	@Html.ValidationMessageFor(model => model.Error, null, new { @class = "text-danger" })
+	@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+	{
+		@Html.AntiForgeryToken()
+	<div class="row">
+		<div class="col-md-12">
+			@Html.TextAreaFor(model => model.InputTxt, new { @placeholder = "Insert Text or URL" })
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<label>
+				@Html.CheckBoxFor(model => model.IsFilterStopWords)
+				@Html.DisplayName("Filter stop-words")
+			</label>
+		</div>
+		<div class="col-md-12">
+			<label>
+				@Html.CheckBoxFor(model => model.IsCalcWordsOnPage)
+				@Html.DisplayName("Calculate occurences of each word")
+			</label>
+		</div>
+		<div class="col-md-12">
+			<label>
+				@Html.CheckBoxFor(model => model.IsCalcMetaTagWordsOnPage)
+				@Html.DisplayName("Calculate occurences of each word listed in meta tags")
+			</label>
+		</div>
+		<div class="col-md-12">
+			<label>
+				@Html.CheckBoxFor(model => model.IsCalcExternalLinks)
+				@Html.DisplayName("Calculate External links on the page")
+			</label>
+		</div>
+		<div class="col-md-12">
+			<input type="submit" class="btn btn-primary" value="Analyse" />
+		</div>
+	</div>
+	}
+</div>
+
+@if (Model.IsValidModel)
+{
+	<div class="row">
+		@if (Model.IsCalcWordsOnPage)
+		{
+			<div class="col-md-12">
+				<h2>Word occurences on the Page</h2>
+				<div class="table-responsive">
+					<table class="table" id="simpleTable">
+						<thead>
+							<tr>
+								<th>Word</th>
+								<th>Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							@{
+								foreach (KeyValuePair<string, int> item in Model.WordCountsOnPage)
+								{
+									<tr>
+										<td>@item.Key</td>
+										<td>@item.Value</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		}
+
+		@if (Model.IsCalcMetaTagWordsOnPage)
+		{
+			<div class="col-md-12">
+				<h2>Word occurences from Meta Tags</h2>
+				<p>Not implemented yet</p>
+			</div>
+		}
+
+		@if (Model.IsCalcExternalLinks)
+		{
+			<div class="col-md-12">
+				<h2>Number of External Links: @Model.CountExternalLinksOnPage</h2>
+			</div>
+		}
+	</div>
+}
+
+
+@section scripts {
+	<script>
+		$(document).ready(function () {
+			$('#simpleTable').DataTable({
+				deferRender: true,
+				scrollY: 200,
+				scrollCollapse: true,
+				scroller: true
+			});
+		});
+	</script>
+}
